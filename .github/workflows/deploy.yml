@@ -3,7 +3,7 @@ name: Deploy React to Azure VM
 on:
   push:
     branches:
-      - main  #deploy on pushes to main branch only
+      - main
 
 jobs:
   deploy:
@@ -18,14 +18,10 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
+      - name: Install dependencies & Build React
         run: |
           cd frontend
           npm install
-
-      - name: Build React app
-        run: |
-          cd frontend
           npm run build
 
       - name: Copy build to Azure VM
@@ -36,3 +32,12 @@ jobs:
           key: ${{ secrets.VM_SSH_KEY }}
           source: "frontend/dist/*"
           target: "/var/www/html/"
+
+      - name: Restart Nginx
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            sudo systemctl restart nginx
