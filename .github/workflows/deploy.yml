@@ -3,7 +3,7 @@ name: Deploy React to Azure VM
 on:
   push:
     branches:
-      - main  
+      - main  #only deploy on pushes to main branch
 
 jobs:
   deploy:
